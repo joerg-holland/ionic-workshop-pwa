@@ -18,8 +18,8 @@ export class PhotoService {
 
 	
   public detectFace(photo: any): Observable<any> {
-    const uriBase = 'https://facial-recognition-holland.cognitiveservices.azure.com/face/v1.0/detect';
-    const subscriptionKey = '1e5badb291934476a9b6166e4263447b';
+    const uriBase = 'https://<URL>.cognitiveservices.azure.com/face/v1.0/detect';
+    const subscriptionKey = '';
    
     const headers = this.getHeaders(subscriptionKey);
     const params = this.getParams();
