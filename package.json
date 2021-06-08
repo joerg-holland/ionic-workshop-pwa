@@ -3,13 +3,19 @@
   "version": "2.0.0",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/docs/angular/your-first-app",
+  "main": "main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "electron": "electron .",
+    "electron:start": "ng build --prod --base-href ./ && electron .",
+    "electron:linux": "ng build --prod --base-href ./ && electron-builder build --linux",
+    "electron:mac": "ng build --prod --base-href ./ && electron-builder build --mac",
+    "electron:windows": "ng build --prod --base-href ./ && electron-builder build --windows"
   },
   "private": true,
   "dependencies": {
@@ -19,7 +25,7 @@
     "@angular/platform-browser": "^12.0.1",
     "@angular/platform-browser-dynamic": "^12.0.1",
     "@angular/router": "^12.0.1",
-    "@capacitor/android": "^3.0.0",
+    "@capacitor/android": "3.0.0",
     "@capacitor/camera": "^1.0.0",
     "@capacitor/core": "^3.0.0",
     "@capacitor/filesystem": "^1.0.0",
@@ -45,6 +51,7 @@
     "@types/jasminewd2": "^2.0.8",
     "@types/node": "^13.11.1",
     "codelyzer": "^5.2.2",
+    "electron-builder": "22.10.5",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~6.3.2",
