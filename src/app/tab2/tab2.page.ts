@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActionSheetController } from '@ionic/angular';
+import { ActionSheetController, AlertController } from '@ionic/angular';
 import { UserPhoto, PhotoService } from '../services/photo.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { UserPhoto, PhotoService } from '../services/photo.service';
 })
 export class Tab2Page {
 
-  constructor(public photoService: PhotoService, public actionSheetController: ActionSheetController) {}
+  constructor(public photoService: PhotoService, public actionSheetController: ActionSheetController, public alertController: AlertController) {}
 
   async ngOnInit() {
     await this.photoService.loadSaved();
@@ -32,8 +32,38 @@ export class Tab2Page {
         handler: () => {
           // Nothing to do, action sheet is automatically closed
          }
+      }, {
+        text: 'Face recognition',
+        role: 'destructive',
+        icon: 'happy',
+        handler: () => {
+          this.photoService.detectFace(photo).subscribe(
+            (result: any) => {
+            console.log(result);
+      
+            if (result.length > 0) {
+              this.showAge(result[0].faceAttributes.age);
+            } else {
+              this.showAge('No face detected.');
+            }
+            },
+            (error: any) => {
+            console.error(error);
+            }
+          );
+        }
       }]
     });
     await actionSheet.present();
+  }
+
+  async showAge(age: string): Promise<any> {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: 'Confirm!',
+      message: 'Your age: ' + age,
+      buttons: ['OK']
+    });	
+    await alert.present();
   }
 }

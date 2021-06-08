@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Storage } from '@capacitor/storage';
 import { Platform } from '@ionic/angular';
-
-
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +14,52 @@ export class PhotoService {
   public photos: UserPhoto[] = [];
   private PHOTO_STORAGE: string = 'photos';
 
-  constructor(private platform: Platform) {}
+  constructor(public http: HttpClient, private platform: Platform) {}
+
+	
+  public detectFace(photo: any): Observable<any> {
+    const uriBase = 'https://facial-recognition-holland.cognitiveservices.azure.com/face/v1.0/detect';
+    const subscriptionKey = '1e5badb291934476a9b6166e4263447b';
+   
+    const headers = this.getHeaders(subscriptionKey);
+    const params = this.getParams();
+    const blob = this._makeblob(photo.webviewPath);
+   
+    return this.http.post(uriBase, blob, {params, headers});
+  }
+
+  private getHeaders(subscriptionKey: string) {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/octet-stream');
+    headers = headers.set('Ocp-Apim-Subscription-Key', subscriptionKey);
+  
+    return headers;
+  }
+
+  private getParams() {
+    const httpParams = new HttpParams()
+      .set('returnFaceId', 'true')
+      .set('returnFaceLandmarks', 'false')
+      .set('returnFaceAttributes', 'age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise'
+      );
+  
+    return httpParams;
+  }
+    
+  private _makeblob(dataURL: any): any {
+    const BASE64_MARKER = ';base64,';
+    const parts = dataURL.split(BASE64_MARKER);
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+  
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+  
+    return new Blob([uInt8Array], { type: contentType });
+  }
 
   public async loadSaved() {
     // Retrieve cached photo array data
@@ -64,6 +109,8 @@ export class PhotoService {
       key: this.PHOTO_STORAGE,
       value: JSON.stringify(this.photos),
     });
+
+    location.reload();
   }
 
   // Save picture to file on device
